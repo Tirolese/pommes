@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pommes Party (Still)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@900&display=swap');
+
+        :root {
+            --fry-color: #FFD700;
+            --fry-darker: #E6C200;
+            --body-bg: #f0f0f0;
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--body-bg);
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            transition: background-color 0.5s ease;
+        }
+
+        .scene {
+            position: relative;
+            width: 200px;
+            height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #french-fry-container {
+            position: absolute;
+            cursor: pointer;
+            transition: transform 0.5s ease-in-out;
+            z-index: 10;
+        }
+
+        .french-fry-svg {
+            width: 80px;
+            height: 300px;
+            filter: drop-shadow(5px 5px 10px rgba(0,0,0,0.2));
+            transition: transform 0.2s ease;
+        }
+        .french-fry-svg:hover {
+            transform: scale(1.05);
+        }
+
+        #eyes, #angry-eyes, #rocket-flame { opacity: 0; transition: opacity 0.5s ease; }
+        #hat { opacity: 0; transition: opacity 0.5s ease, transform 0.5s ease; transform-origin: bottom center; }
+
+        /* Animationen */
+        .dancing { animation: dance 0.5s infinite ease-in-out alternate; }
+        @keyframes dance {
+            0% { transform: translateY(0) rotate(-2deg); }
+            100% { transform: translateY(-20px) rotate(2deg); }
+        }
+
+        .party-lights { animation: disco 0.2s infinite linear; }
+        @keyframes disco {
+            0% { background-color: #ff00de; }
+            25% { background-color: #00f2ff; }
+            50% { background-color: #15ff00; }
+            75% { background-color: #fffb00; }
+            100% { background-color: #ff00de; }
+        }
+
+        .walk-away { animation: walk 3s ease-in-out forwards; }
+        @keyframes walk {
+            0% { transform: translateX(0) rotate(0); }
+            20% { transform: translateX(0) rotate(-5deg); }
+            40% { transform: translateX(50px) rotate(5deg); }
+            60% { transform: translateX(100px) rotate(-5deg); }
+            100% { transform: translateX(150vw) rotate(10deg); }
+        }
+        
+        .shaking { animation: shake 0.3s infinite linear; }
+        @keyframes shake {
+            0% { transform: translateX(0) rotate(0); }
+            25% { transform: translateX(-2px) rotate(-1deg); }
+            50% { transform: translateX(2px) rotate(1deg); }
+            75% { transform: translateX(-2px) rotate(-1deg); }
+            100% { transform: translateX(0) rotate(0); }
+        }
+        
+        .rocket-launch { animation: launch 3s ease-in forwards; }
+        @keyframes launch {
+            0% { transform: translateY(0) rotate(0); }
+            20% { transform: translateY(-50px) rotate(0); }
+            100% { transform: translateY(-150vh) rotate(0); }
+        }
+        
+        #rocket-flame {
+            transform-origin: 50% 100%;
+            animation: flame-flicker 0.1s infinite alternate;
+        }
+
+        @keyframes flame-flicker {
+            from { transform: scaleY(1); }
+            to { transform: scaleY(1.2); }
+        }
+
+
+        /* Achievement-Nachricht */
+        #achievement {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: white;
+            color: black;
+            padding: 20px 40px;
+            border-radius: 15px;
+            font-size: 1.5rem;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s, visibility 0.5s;
+            z-index: 100;
+        }
+        #achievement.show { opacity: 1; visibility: visible; }
+
+        /* Party-Elemente: Schrift und Ballons */
+        .party-element {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .party-text, .balloon {
+            position: absolute;
+            opacity: 0;
+            font-size: 4rem;
+            font-weight: 900;
+            color: white;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+        }
+
+        .party-container.show .party-text, .party-container.show .balloon {
+            animation: pop-and-fade 1s ease-out forwards;
+        }
+        
+        .balloon {
+            width: 50px;
+            height: 65px;
+            border-radius: 50%;
+            animation-name: float-and-fade;
+        }
+        .balloon::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 10px solid;
+        }
+
+        #p1 { top: 20%; left: 10%; animation-delay: 0s; }
+        #p2 { top: 50%; left: 60%; animation-delay: 0.2s; }
+        #p3 { top: 60%; left: 15%; animation-delay: 0.4s; }
+
+        #b1 { background: #ff4757; left: 15%; animation-delay: 0.1s; }
+        #b1::after { border-top-color: #ff4757; }
+        #b2 { background: #2ed573; left: 45%; animation-delay: 0.5s; }
+        #b2::after { border-top-color: #2ed573; }
+        #b3 { background: #1e90ff; left: 75%; animation-delay: 0.3s; }
+        #b3::after { border-top-color: #1e90ff; }
+        
+        @keyframes pop-and-fade {
+            0% { transform: scale(0); opacity: 0; }
+            20% { transform: scale(1.2); opacity: 1; }
+            80% { transform: scale(0.9); opacity: 1; }
+            100% { transform: scale(0.8); opacity: 0; }
+        }
+        
+        @keyframes float-and-fade {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            20% { transform: translateY(50vh) scale(1); opacity: 1; }
+            100% { transform: translateY(-100px) scale(0.5); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="achievement"></div>
+
+    <div class="party-container">
+        <div class="party-element">
+            <div class="party-text" id="p1">Pommes!</div>
+            <div class="party-text" id="p2">Pommes!</div>
+            <div class="party-text" id="p3">Pommes!</div>
+        </div>
+        <div class="party-element">
+            <div class="balloon" id="b1"></div>
+            <div class="balloon" id="b2"></div>
+            <div class="balloon" id="b3"></div>
+        </div>
+    </div>
+
+    <div class="scene">
+        <div id="french-fry-container">
+            <svg class="french-fry-svg" viewBox="0 0 80 300">
+                <g id="hat">
+                    <path d="M 10 70 C 10 60, 70 60, 70 70 Z" fill="#333"/>
+                    <rect x="0" y="70" width="80" height="15" rx="5" fill="#333"/>
+                    <rect x="5" y="65" width="70" height="5" fill="#555"/>
+                </g>
+                <path d="M 10 0 C 0 10, 0 290, 10 300 L 70 300 C 80 290, 80 10, 70 0 Z" fill="var(--fry-color)"/>
+                <path d="M 15 10 C 10 20, 10 280, 15 290 L 25 290 L 25 10 Z" fill="var(--fry-darker)" opacity="0.2"/>
+                <g id="eyes">
+                    <circle cx="30" cy="100" r="5" fill="black"/>
+                    <circle cx="50" cy="100" r="5" fill="black"/>
+                    <path d="M 35 120 Q 40 130, 45 120" stroke="black" stroke-width="3" fill="none"/>
+                </g>
+                <g id="angry-eyes">
+                    <path d="M 20 95 L 40 105" stroke="black" stroke-width="6" stroke-linecap="round"/>
+                    <path d="M 60 95 L 40 105" stroke="black" stroke-width="6" stroke-linecap="round"/>
+                    <path d="M 30 125 Q 40 115, 50 125" stroke="black" stroke-width="3" fill="none"/>
+                </g>
+                <g id="rocket-flame">
+                    <polygon points="10,300 70,300 40,350" fill="orange" />
+                    <polygon points="20,300 60,300 40,330" fill="red" />
+                </g>
+            </svg>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            const fryContainer = document.getElementById('french-fry-container');
+            const body = document.body;
+            const achievement = document.getElementById('achievement');
+            const eyes = document.getElementById('eyes');
+            const angryEyes = document.getElementById('angry-eyes');
+            const hat = document.getElementById('hat');
+            const partyContainer = document.querySelector('.party-container');
+            const rocketFlame = document.getElementById('rocket-flame');
+
+            let clickCount = 0;
+            let isPartyActive = false;
+            let achievementLevel = 0; // 0=none, 1=first, 2=second, 3=third
+
+            function startParty() {
+                if (isPartyActive) return;
+
+                isPartyActive = true;
+                clickCount++;
+
+                fryContainer.classList.add('dancing');
+                body.classList.add('party-lights');
+                partyContainer.classList.add('show');
+
+                setTimeout(() => {
+                    fryContainer.classList.remove('dancing');
+                    body.classList.remove('party-lights');
+                    partyContainer.classList.remove('show');
+                    isPartyActive = false;
+
+                    if (clickCount >= 15 && achievementLevel < 3) {
+                        triggerThirdAchievement();
+                    } else if (clickCount >= 10 && achievementLevel < 2) {
+                        triggerSecondAchievement();
+                    } else if (clickCount >= 5 && achievementLevel < 1) {
+                        triggerFirstAchievement();
+                    }
+                }, 1000); // Party dauert jetzt 1 Sekunde
+            }
+
+            function triggerFirstAchievement() {
+                achievementLevel = 1;
+                fryContainer.style.cursor = 'default';
+                achievement.textContent = "Du hast wirklich nichts zu tun!?";
+                achievement.classList.add('show');
+
+                setTimeout(() => {
+                    eyes.style.opacity = 1;
+                    hat.style.opacity = 1;
+                }, 500);
+
+                setTimeout(() => {
+                    fryContainer.classList.add('walk-away');
+                }, 2500);
+
+                setTimeout(resetEverything, 5500);
+            }
+
+            function triggerSecondAchievement() {
+                achievementLevel = 2;
+                fryContainer.style.cursor = 'default';
+                achievement.textContent = "Was soll das, geh Arbeiten!";
+                achievement.classList.add('show');
+                
+                setTimeout(() => {
+                    angryEyes.style.opacity = 1;
+                    fryContainer.classList.add('shaking');
+                }, 500);
+
+                setTimeout(resetEverything, 5500);
+            }
+
+            function triggerThirdAchievement() {
+                achievementLevel = 3;
+                fryContainer.style.cursor = 'default';
+                achievement.textContent = "Die Sonnenrakete startet!";
+                achievement.classList.add('show');
+
+                setTimeout(() => {
+                    rocketFlame.style.opacity = 1;
+                    fryContainer.classList.add('rocket-launch');
+                }, 500);
+
+                setTimeout(resetEverything, 5500);
+            }
+
+            function resetEverything() {
+                achievement.classList.remove('show');
+                fryContainer.classList.remove('walk-away');
+                fryContainer.classList.remove('shaking');
+                fryContainer.classList.remove('rocket-launch');
+                
+                setTimeout(() => {
+                    eyes.style.opacity = 0;
+                    angryEyes.style.opacity = 0;
+                    hat.style.opacity = 0;
+                    rocketFlame.style.opacity = 0;
+                    fryContainer.style.cursor = 'pointer';
+                    
+                    if (achievementLevel >= 3) {
+                        achievementLevel = 0;
+                        clickCount = 0;
+                    }
+                }, 500);
+            }
+
+            fryContainer.addEventListener('click', startParty);
+        };
+    </script>
+</body>
+</html>
