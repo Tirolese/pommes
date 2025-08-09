@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pommes Party (Still)</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700;900&display=swap');
 
         :root {
             --fry-color: #FFD700;
@@ -17,6 +17,7 @@
             height: 100%;
             margin: 0;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             background-color: var(--body-bg);
@@ -131,8 +132,8 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             overflow: hidden;
             pointer-events: none;
         }
@@ -190,6 +191,50 @@
             20% { transform: translateY(50vh) scale(1); opacity: 1; }
             100% { transform: translateY(-100px) scale(0.5); opacity: 0; }
         }
+
+        /* Ladebalken */
+        #progress-wrapper {
+            position: absolute;
+            bottom: 5%;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        #progress-container {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 15px;
+            border: 2px solid #ccc;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        #progress-bar {
+            width: 0%; /* Startet bei 0% */
+            height: 30px;
+            background: linear-gradient(90deg, #ffd700, #ffa500);
+            border-radius: 13px;
+            transition: width 0.5s ease-out;
+        }
+
+        #progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #333;
+            font-weight: 900;
+            text-shadow: 1px 1px 2px white;
+        }
+
+        #progress-comment {
+            margin-top: 10px;
+            color: #555;
+            font-weight: 700;
+            height: 20px; /* Feste Höhe, um Springen zu vermeiden */
+            transition: opacity 0.5s;
+        }
     </style>
 </head>
 <body>
@@ -237,6 +282,14 @@
         </div>
     </div>
 
+    <div id="progress-wrapper">
+        <div id="progress-container">
+            <div id="progress-bar"></div>
+            <div id="progress-text">0%</div>
+        </div>
+        <div id="progress-comment"></div>
+    </div>
+
     <script>
         window.onload = function() {
             const fryContainer = document.getElementById('french-fry-container');
@@ -247,16 +300,23 @@
             const hat = document.getElementById('hat');
             const partyContainer = document.querySelector('.party-container');
             const rocketFlame = document.getElementById('rocket-flame');
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            const progressComment = document.getElementById('progress-comment');
 
             let clickCount = 0;
             let isPartyActive = false;
             let achievementLevel = 0; // 0=none, 1=first, 2=second, 3=third
+
+            const totalClicksForReset = 15;
 
             function startParty() {
                 if (isPartyActive) return;
 
                 isPartyActive = true;
                 clickCount++;
+
+                updateProgressBar();
 
                 fryContainer.classList.add('dancing');
                 body.classList.add('party-lights');
@@ -275,7 +335,24 @@
                     } else if (clickCount >= 5 && achievementLevel < 1) {
                         triggerFirstAchievement();
                     }
-                }, 1000); // Party dauert jetzt 1 Sekunde
+                }, 1000); 
+            }
+            
+            function updateProgressBar() {
+                const progress = Math.min((clickCount / totalClicksForReset) * 100, 100);
+                progressBar.style.width = progress + '%';
+                progressText.textContent = Math.round(progress) + '%';
+                
+                // Update comments based on progress
+                if (clickCount > 12) {
+                    progressComment.textContent = "Fast geschafft!";
+                } else if (clickCount > 7) {
+                    progressComment.textContent = "Was erwartet uns bei 100%?";
+                } else if (clickCount > 3) {
+                    progressComment.textContent = "Gleich passiert etwas...";
+                } else if (clickCount > 0) {
+                    progressComment.textContent = "Was wird hier wohl geladen?";
+                }
             }
 
             function triggerFirstAchievement() {
@@ -340,6 +417,9 @@
                     if (achievementLevel >= 3) {
                         achievementLevel = 0;
                         clickCount = 0;
+                        progressBar.style.width = '0%';
+                        progressText.textContent = '0%';
+                        progressComment.textContent = '';
                     }
                 }, 500);
             }
